@@ -19,5 +19,3 @@ typedef struct{
 #endif /* __cplusplus */
 
 #endif /* myvar */
-
-
