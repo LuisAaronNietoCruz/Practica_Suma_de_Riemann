@@ -4,12 +4,19 @@
 - Luis Aaron Nieto Cruz ([LuisAaronNietoCruz](https://github.com/LuisAaronNietoCruz))
 
 ## Objetivo
-El objetivo de esta practica es calcular la integral de Riemann.
+El objetivo del programa es calcular la integral (Riemann) de una función en un intervalo dado utilizando múltiples procesos en un entorno de programación paralela con MPI (Message Passing Interface).
 
 ## Ejecución
 Clonar el repositorio:
-git clone https://github.com/LuisAaronNietoCruz/Practica_Imagen
+git clone https://github.com/LuisAaronNietoCruz/Practica_Suma_de_Riemann.git
 
-Compilar el archivo:
+Compilar el archivo main:
+`mpicc main.c -o main`
 
-mpiexec -n 8 ./main 0 2 10 5000
+Correr el archivo compilado:
+`mpiexec -n 8 ./main 0 2 10 5000`
+
+## Resultado
+![image](https://github.com/LuisAaronNietoCruz/Practica_Suma_de_Riemann/assets/100148692/2b481ae5-eea7-4563-8830-fbced7bf7521)
+
+https://github.com/LuisAaronNietoCruz/Practica_Anillo/blob/main/Compilaci%C3%B3n.jpg
