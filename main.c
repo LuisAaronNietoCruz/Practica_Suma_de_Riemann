@@ -15,12 +15,13 @@ double f(double x) {
 int main(int argn, char **argc) {
   int miproc, numproc;
   MPI_Status status;
-  int data;
-  double a, b, dx, sum, F;
+//  int data;
+  double a, b, dx, F;
   MPI_myvar range;
   int segments;
   int n_partition;
   double block;
+  double sum = 0.0;	
 
   MPI_Init(&argn, &argc); /* Inicializar MPI */
   MPI_Comm_rank(MPI_COMM_WORLD, &miproc); /* Determinar el rango del proceso invocado */
@@ -49,17 +50,17 @@ int main(int argn, char **argc) {
       printf("Error al convertir partition\n");
       return 0;
     }
-    dx = (b - a) / (segments * n_partition);
-    block = (b - a) / segments;
+    dx = (b - a) / ((double)(segments * n_partition));
+    block = (b - a) / ((double)segments);
     printf("[%lf, %lf] range=%i n=%i, dx=%lf\n", a, b, segments, n_partition, dx);
   } //master reading command line
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (miproc != 0) { // slaves
-    double F = 0.0; //result
-    data = 1;
-    range.F = 0.0;
+//    double F = 0.0; //result
+//    data = 1;
+//    range.F = 0.0;
 
     while (1) {
       MPI_Send(&range, sizeof(range), MPI_CHARACTER, 0, 0, MPI_COMM_WORLD);
@@ -70,37 +71,40 @@ int main(int argn, char **argc) {
       int i = 0;
       F = 0.0;
       do {
-        x = range.a + ((double) i) * range.dx;
+        x = range.a + (((double) i) * range.dx);
         F += f(x) * range.dx;
         i++;
       } while (x <= range.b);
 
       range.F = F;
-      printf("%i:[%lf,%lf] dx=%lf F=%lf\n", miproc, range.a, range.b, range.dx, range.F);
+//      printf("%i:[%lf,%lf] dx=%lf F=%lf\n", miproc, range.a, range.b, range.dx, range.F);
       //Parallel processing
     }
 
   } else { //Master
     int flag = -1;
     MPI_Request request;
-    double sum = 0;
+//    double sum = 0;
     int n = 0;
     while (1) {
-      if (flag != 0) {
+      if (flag == -1) {
         MPI_Irecv(&range, sizeof(range), MPI_CHARACTER, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
-        flag = 0;
+        flag = 1;
       }
       MPI_Test(&request, &flag, &status);
-      if (flag != 0) {
-        if (status.MPI_SOURCE != -1) {
+      if (flag == 1) {
+        if (status.MPI_SOURCE == 1) {
           // sending information
-          // segmentar la informacion para enviarla al nodo disponible
+          if (n != 0) {
+            printf("%i: [%lf, %lf] dx=%lf F=%lf\n", range.a, range.b, range.dx, range.F);
+          }
+	  // segmentar la informacion para enviarla al nodo disponible
           //printf("%i: %lf\n",status.MPI_SOURCE,range.F);
           sum += range.F;
           range.a = a + n * block;
           range.b = a + (n + 1) * block;
           range.dx = dx;
-          range.F = 0.0;
+          //range.F = 0.0;
           n++;
           MPI_Send(&range, sizeof(range), MPI_CHARACTER, status.MPI_SOURCE, 0, MPI_COMM_WORLD);
         }
@@ -109,8 +113,8 @@ int main(int argn, char **argc) {
 
       //stop condition
       //if ((a+n*dx) >= b){
-      if (n == segments) {
-        printf("%i, F=%le\n", n, sum);
+      if (n > segments) {
+        printf("%i, F=%le\n", n - 1, sum);
         break;
       }
     } //while(1)
