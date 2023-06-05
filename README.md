@@ -14,20 +14,20 @@ Compilar el archivo main:
 `mpicc main.c -o main`
 
 Correr el archivo compilado:
-`mpiexec -n 8 ./main 0 2 10 5000`
+`mpiexec -n [numero de procesos] ./main [a] [b] [range] [n]`
 
 ## Resultado
 
 Con:
 
-a = 0.
+a = 0. # donde `a` es el límite inferior del intervalo de integración.
 
-b = 2.
+b = 2. # donde `b` es el límite superior del intervalo de integración.
 
-range = 10.
+range = 10. # donde `range` es el número de segmentos en que se divide el intervalo de integración.
 
-n = 5000.
+n = 5000. # donde `n` es el número de particiones de cada segmento.
 
-Utilizando 8 procesadores.
+Número de procesos = 8.
 
 ![image](https://github.com/LuisAaronNietoCruz/Practica_Suma_de_Riemann/blob/main/Compilaci%C3%B3n_main.c.jpg)
